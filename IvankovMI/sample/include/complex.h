@@ -23,6 +23,15 @@ struct Complex {
 	const Complex& operator*=(const Complex&);
 	const Complex& operator/=(const Complex&);
 
+	const Complex& operator++();
+	const Complex& operator++(int);
+	const Complex& operator--();
+	const Complex& operator--(int);
+
+
+	Complex operator+() const;
+	Complex operator-() const;
+	
 	Complex operator+(const Complex&) const;
 	Complex operator-(const Complex&) const;
 	Complex operator*(const Complex&) const;

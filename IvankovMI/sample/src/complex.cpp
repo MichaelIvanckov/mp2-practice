@@ -16,10 +16,31 @@ const Complex& Complex::operator=(Complex&& c) {
 	return operator=(c);
 }
 
-const Complex& Complex::operator+=(const Complex& c);
-const Complex& Complex::operator-=(const Complex& c);
-const Complex& Complex::operator*=(const Complex& c);
-const Complex& Complex::operator/=(const Complex& c);
+const Complex& Complex::operator+=(const Complex& c) {
+	re += c.re; im += c.im;
+	return *this;
+};
+const Complex& Complex::operator-=(const Complex& c) {
+	re -= c.re; im -= c.im;
+	return *this;
+};
+const Complex& Complex::operator*=(const Complex& c) {
+	re *= c.re; im *= c.im;
+	return *this;
+};
+const Complex& Complex::operator/=(const Complex& c) {
+	re /= c.re; im /= c.im;
+	return *this;
+};
+
+const Complex& Complex::operator++();
+const Complex& Complex::operator++(int);
+const Complex& Complex::operator--();
+const Complex& Complex::operator--(int);
+
+
+Complex Complex::operator+() const { return Complex(*this); };
+Complex Complex::operator-() const { return Complex(-re, -im); };
 
 Complex Complex::operator+(const Complex& c) const;
 Complex Complex::operator-(const Complex& c) const;
