@@ -82,6 +82,7 @@ public:
 
 // Динамическая матрица - 
 // шаблонная матрица на динамической памяти
+// Хранит только верхний треугольник: строка i имеет длину sz - i
 template<typename T>
 class TDynamicMatrix : private TDynamicVector<TDynamicVector<T>>
 {
@@ -89,16 +90,64 @@ class TDynamicMatrix : private TDynamicVector<TDynamicVector<T>>
     using TDynamicVector<TDynamicVector<T>>::sz;
 private:
     static size_t checkSize(size_t s);
+
+    // Прокси-строка для доступа к элементам верхнего треугольника с сохранением синтаксиса m[i][j]
+    class RowProxy {
+    public:
+        TDynamicVector<T>& row;
+        size_t offset;
+        size_t n;
+        RowProxy(TDynamicVector<T>& r, size_t off, size_t size) : row(r), offset(off), n(size) {}
+        size_t size() const { return n; }
+        T& operator[](size_t j) { return row[j - offset]; }
+        const T& operator[](size_t j) const { return row[j - offset]; }
+        T& at(size_t j) {
+            if (j < offset) throw std::out_of_range("Index below main diagonal");
+            if (j >= n) throw std::out_of_range("Index out of range");
+            return row.at(j - offset);
+        }
+        const T& at(size_t j) const {
+            if (j < offset) { static const T def = T(); return def; }
+            if (j >= n) throw std::out_of_range("Index out of range");
+            return row.at(j - offset);
+        }
+    };
+
+    class ConstRowProxy {
+    public:
+        const TDynamicVector<T>& row;
+        size_t offset;
+        size_t n;
+        ConstRowProxy(const TDynamicVector<T>& r, size_t off, size_t size) : row(r), offset(off), n(size) {}
+        size_t size() const { return n; }
+        const T& operator[](size_t j) const { return row[j - offset]; }
+        const T& at(size_t j) const {
+            if (j < offset) { static const T def = T(); return def; }
+            if (j >= n) throw std::out_of_range("Index out of range");
+            return row.at(j - offset);
+        }
+    };
+
 public:
     TDynamicMatrix(size_t s = 1);
 
-    using TDynamicVector<TDynamicVector<T>>::operator[];
-    using TDynamicVector<TDynamicVector<T>>::size;   // размер матрицы (число строк)  (добавил сам)
-    using TDynamicVector<TDynamicVector<T>>::at;     // доступ к строке с контролем   (добавил сам)
+    using TDynamicVector<TDynamicVector<T>>::size;
+    using TDynamicVector<TDynamicVector<T>>::at; // доступ к строке с контролем
 
-    // доступ к элементу с контролем по двум индексам   (добавил сам)
-    T& at(size_t i, size_t j);
-    const T& at(size_t i, size_t j) const;
+    RowProxy operator[](size_t i) {
+        return RowProxy(TDynamicVector<TDynamicVector<T>>::at(i), i, sz);
+    }
+    ConstRowProxy operator[](size_t i) const {
+        return ConstRowProxy(TDynamicVector<TDynamicVector<T>>::at(i), i, sz);
+    }
+
+    // доступ к элементу с контролем по двум индексам
+    T& at(size_t i, size_t j) {
+        return (*this)[i].at(j);
+    }
+    const T& at(size_t i, size_t j) const {
+        return (*this)[i].at(j);
+    }
 
     // сравнение
     bool operator==(const TDynamicMatrix& m) const noexcept;
@@ -118,16 +167,20 @@ public:
     friend istream& operator>>(istream& istr, TDynamicMatrix& v)
     {
         for (size_t i = 0; i < v.sz; ++i)
-            for (size_t j = 0; j < v.sz; ++j)
-                istr >> v.pMem[i][j];
+            for (size_t j = 0; j < v.sz; ++j) {
+                T val;
+                istr >> val;
+                if (j >= i)
+                    v[i][j] = val;
+                // значения ниже диагонали игнорируются
+            }
         return istr;
     }
     friend ostream& operator<<(ostream& ostr, const TDynamicMatrix& v)
     {
-        for (size_t i = 0; i < v.sz; ++i)
-        {
+        for (size_t i = 0; i < v.sz; ++i) {
             for (size_t j = 0; j < v.sz; ++j)
-                ostr << v.pMem[i][j] << ' ';
+                ostr << v.at(i, j) << ' ';
             ostr << '\n';
         }
         return ostr;
@@ -337,32 +390,18 @@ TDynamicMatrix<T>::TDynamicMatrix(size_t s)
     : TDynamicVector<TDynamicVector<T>>(checkSize(s))
 {
     for (size_t i = 0; i < sz; ++i)
-        pMem[i] = TDynamicVector<T>(sz); //todo sz-i
-}
-
-template<typename T>
-T& TDynamicMatrix<T>::at(size_t i, size_t j)
-{
-    // проверки обеих границ делегируются существующим at базового вектора и строки
-    return TDynamicVector<TDynamicVector<T>>::at(i).at(j);
-}
-
-template<typename T>
-const T& TDynamicMatrix<T>::at(size_t i, size_t j) const
-{
-    return TDynamicVector<TDynamicVector<T>>::at(i).at(j);
+        pMem[i] = TDynamicVector<T>(sz - i);
 }
 
 template<typename T>
 bool TDynamicMatrix<T>::operator==(const TDynamicMatrix& m) const noexcept
 {
-    if (this == &m)
-        return true;
     if (sz != m.sz)
         return false;
     for (size_t i = 0; i < sz; ++i)
-        if (pMem[i] != m.pMem[i])
-            return false;
+        for (size_t j = i; j < sz; ++j)
+            if (at(i, j) != m.at(i, j))
+                return false;
     return true;
 }
 
@@ -371,8 +410,8 @@ TDynamicMatrix<T> TDynamicMatrix<T>::operator*(const T& val)
 {
     TDynamicMatrix result(sz);
     for (size_t i = 0; i < sz; ++i)
-        for (size_t j = 0; j < sz; ++j)
-            result[i][j] = pMem[i][j] * val;
+        for (size_t j = i; j < sz; ++j)
+            result[i][j] = at(i, j) * val;
     return result;
 }
 
@@ -385,8 +424,8 @@ TDynamicVector<T> TDynamicMatrix<T>::operator*(const TDynamicVector<T>& v)
     for (size_t i = 0; i < sz; ++i)
     {
         T sum = T();
-        for (size_t j = 0; j < sz; ++j)
-            sum = sum + pMem[i][j] * v[j];
+        for (size_t j = i; j < sz; ++j)
+            sum = sum + at(i, j) * v[j];
         result[i] = sum;
     }
     return result;
@@ -399,8 +438,8 @@ TDynamicMatrix<T> TDynamicMatrix<T>::operator+(const TDynamicMatrix& m)
         throw std::out_of_range("Matrix sizes must match");
     TDynamicMatrix result(sz);
     for (size_t i = 0; i < sz; ++i)
-        for (size_t j = 0; j < sz; ++j)
-            result[i][j] = pMem[i][j] + m.pMem[i][j];
+        for (size_t j = i; j < sz; ++j)
+            result[i][j] = at(i, j) + m.at(i, j);
     return result;
 }
 
@@ -411,8 +450,8 @@ TDynamicMatrix<T> TDynamicMatrix<T>::operator-(const TDynamicMatrix& m)
         throw std::out_of_range("Matrix sizes must match");
     TDynamicMatrix result(sz);
     for (size_t i = 0; i < sz; ++i)
-        for (size_t j = 0; j < sz; ++j)
-            result[i][j] = pMem[i][j] - m.pMem[i][j];
+        for (size_t j = i; j < sz; ++j)
+            result[i][j] = at(i, j) - m.at(i, j);
     return result;
 }
 
@@ -423,11 +462,11 @@ TDynamicMatrix<T> TDynamicMatrix<T>::operator*(const TDynamicMatrix& m)
         throw std::out_of_range("Matrix sizes must match");
     TDynamicMatrix result(sz);
     for (size_t i = 0; i < sz; ++i)
-        for (size_t j = 0; j < sz; ++j)
+        for (size_t j = i; j < sz; ++j)
         {
             T sum = T();
-            for (size_t k = 0; k < sz; ++k)
-                sum = sum + pMem[i][k] * m.pMem[k][j];
+            for (size_t k = i; k <= j; ++k)
+                sum = sum + at(i, k) * m.at(k, j);
             result[i][j] = sum;
         }
     return result;
