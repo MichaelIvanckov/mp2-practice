@@ -201,8 +201,8 @@ TEST(TDynamicVector, can_multiply_scalar_by_vector)
 	v1[0] = 2;
 	v1[1] = 4;
 	v1[2] = 6;
-
-	EXPECT_EQ(v1, v * 2);
+	TDynamicVector<int> res = v * 2;
+	EXPECT_EQ(v1, res);
 }
 
 TEST(TDynamicVector, can_add_vectors_with_equal_size)

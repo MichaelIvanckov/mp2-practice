@@ -48,15 +48,19 @@ public:
     bool operator==(const TDynamicVector& v) const noexcept;
     bool operator!=(const TDynamicVector& v) const noexcept;
 
+    // унарные операции
+    TDynamicVector operator+();
+    TDynamicVector operator-();
+
     // скалярные операции
     TDynamicVector operator+(T val);
     TDynamicVector operator-(T val);
-    TDynamicVector operator*(T val);
+    TDynamicVector operator*(T val) const;
 
     // векторные операции
     TDynamicVector operator+(const TDynamicVector& v);
     TDynamicVector operator-(const TDynamicVector& v);
-    T operator*(const TDynamicVector& v);      // удалено noexcept т. к. был тест с именем «cant_multiply_vectors_with_not_equal_size»
+    T operator*(const TDynamicVector& v) noexcept(noexcept(T()));      // удалено noexcept т. к. был тест с именем «cant_multiply_vectors_with_not_equal_size»
 
     friend void swap(TDynamicVector& lhs, TDynamicVector& rhs) noexcept
     {
@@ -194,7 +198,7 @@ public:
     bool operator==(const TDynamicMatrix& m) const noexcept;
 
     // матрично-скалярные операции
-    TDynamicMatrix operator*(const T& val);
+    TDynamicMatrix operator*(const T& val) const;
 
     // матрично-векторные операции
     TDynamicVector<T> operator*(const TDynamicVector<T>& v);
@@ -253,14 +257,14 @@ TDynamicVector<T>::TDynamicVector(T* arr, size_t s) : sz(s)
 }
 
 template<typename T>
-TDynamicVector<T>::TDynamicVector(const TDynamicVector& v) : sz(v.sz)
+TDynamicVector<T>::TDynamicVector(const TDynamicVector<T>& v) : sz(v.sz)
 {
     pMem = new T[sz];
     std::copy(v.pMem, v.pMem + sz, pMem);
 }
 
 template<typename T>
-TDynamicVector<T>::TDynamicVector(TDynamicVector&& v) noexcept
+TDynamicVector<T>::TDynamicVector(TDynamicVector<T>&& v) noexcept
     : sz(v.sz), pMem(v.pMem)
 {
     v.sz = 0;
@@ -274,7 +278,7 @@ TDynamicVector<T>::~TDynamicVector()
 }
 
 template<typename T>
-TDynamicVector<T>& TDynamicVector<T>::operator=(const TDynamicVector& v)
+TDynamicVector<T>& TDynamicVector<T>::operator=(const TDynamicVector<T>& v)
 {
     if (this != &v)
     {
@@ -285,7 +289,7 @@ TDynamicVector<T>& TDynamicVector<T>::operator=(const TDynamicVector& v)
 }
 
 template<typename T>
-TDynamicVector<T>& TDynamicVector<T>::operator=(TDynamicVector&& v) noexcept
+TDynamicVector<T>& TDynamicVector<T>::operator=(TDynamicVector<T>&& v) noexcept
 {
     if (this != &v)
     {
@@ -327,7 +331,7 @@ const T& TDynamicVector<T>::at(size_t ind) const
 }
 
 template<typename T>
-bool TDynamicVector<T>::operator==(const TDynamicVector& v) const noexcept
+bool TDynamicVector<T>::operator==(const TDynamicVector<T>& v) const noexcept
 {
     if (sz != v.sz)
         return false;
@@ -338,9 +342,24 @@ bool TDynamicVector<T>::operator==(const TDynamicVector& v) const noexcept
 }
 
 template<typename T>
-bool TDynamicVector<T>::operator!=(const TDynamicVector& v) const noexcept
+bool TDynamicVector<T>::operator!=(const TDynamicVector<T>& v) const noexcept
 {
     return !(*this == v);
+}
+
+template<typename T>
+TDynamicVector<T> TDynamicVector<T>::operator+()
+{
+    return TDynamicVector(*this);
+}
+
+template<typename T>
+TDynamicVector<T> TDynamicVector<T>::operator-()
+{
+    TDynamicVector result(sz);
+    for (size_t i = 0; i < sz; ++i)
+        result.pMem[i] = -(pMem[i]);
+    return result;
 }
 
 template<typename T>
@@ -355,14 +374,11 @@ TDynamicVector<T> TDynamicVector<T>::operator+(T val)
 template<typename T>
 TDynamicVector<T> TDynamicVector<T>::operator-(T val) // todo v+(-val)
 {
-    TDynamicVector result(sz);
-    for (size_t i = 0; i < sz; ++i)
-        result.pMem[i] = pMem[i] - val;
-    return result;
+    return (*this) + (-val);
 }
 
 template<typename T>
-TDynamicVector<T> TDynamicVector<T>::operator*(T val)
+TDynamicVector<T> TDynamicVector<T>::operator*(T val) const
 {
     TDynamicVector result(sz);
     for (size_t i = 0; i < sz; ++i)
@@ -371,7 +387,7 @@ TDynamicVector<T> TDynamicVector<T>::operator*(T val)
 }
 
 template<typename T>
-TDynamicVector<T> TDynamicVector<T>::operator+(const TDynamicVector& v)
+TDynamicVector<T> TDynamicVector<T>::operator+(const TDynamicVector<T>& v)
 {
     if (sz != v.sz)
         throw std::out_of_range("Vector sizes must match");
@@ -382,18 +398,13 @@ TDynamicVector<T> TDynamicVector<T>::operator+(const TDynamicVector& v)
 }
 
 template<typename T>
-TDynamicVector<T> TDynamicVector<T>::operator-(const TDynamicVector& v) //todo v+v1*(-1)
+TDynamicVector<T> TDynamicVector<T>::operator-(const TDynamicVector<T>& v) //todo v+v1*(-1)
 {
-    if (sz != v.sz)
-        throw std::out_of_range("Vector sizes must match");
-    TDynamicVector result(sz);
-    for (size_t i = 0; i < sz; ++i)
-        result.pMem[i] = pMem[i] - v.pMem[i];
-    return result;
+    return (*this) + (v * static_cast<T>(-1));
 }
 
 template<typename T>
-T TDynamicVector<T>::operator*(const TDynamicVector& v)
+T TDynamicVector<T>::operator*(const TDynamicVector<T>& v)
 {
     if (sz != v.sz)
         throw std::out_of_range("Vector sizes must match");
@@ -435,7 +446,7 @@ TDynamicMatrix<T>::TDynamicMatrix(size_t s)
 }
 
 template<typename T>
-bool TDynamicMatrix<T>::operator==(const TDynamicMatrix& m) const noexcept
+bool TDynamicMatrix<T>::operator==(const TDynamicMatrix<T>& m) const noexcept
 {
     if (sz != m.sz)
         return false;
@@ -447,12 +458,11 @@ bool TDynamicMatrix<T>::operator==(const TDynamicMatrix& m) const noexcept
 }
 
 template<typename T>
-TDynamicMatrix<T> TDynamicMatrix<T>::operator*(const T& val) //todo
+TDynamicMatrix<T> TDynamicMatrix<T>::operator*(const T& val) const
 {
     TDynamicMatrix result(sz);
     for (size_t i = 0; i < sz; ++i)
-        for (size_t j = i; j < sz; ++j)
-            result[i][j] = at(i, j) * val;
+        result[i] = pMem[i] * val;
     return result;
 }
 
@@ -473,31 +483,29 @@ TDynamicVector<T> TDynamicMatrix<T>::operator*(const TDynamicVector<T>& v)
 }
 
 template<typename T>
-TDynamicMatrix<T> TDynamicMatrix<T>::operator+(const TDynamicMatrix& m) //todo
+TDynamicMatrix<T> TDynamicMatrix<T>::operator+(const TDynamicMatrix<T>& m)
 {
     if (sz != m.sz)
         throw std::out_of_range("Matrix sizes must match");
     TDynamicMatrix result(sz);
     for (size_t i = 0; i < sz; ++i)
-        for (size_t j = i; j < sz; ++j)
-            result[i][j] = at(i, j) + m.at(i, j);
+        result[i].getVector() = at(i).getVector() + m.at(i).getVector();
     return result;
 }
 
 template<typename T>
-TDynamicMatrix<T> TDynamicMatrix<T>::operator-(const TDynamicMatrix& m) //todo
+TDynamicMatrix<T> TDynamicMatrix<T>::operator-(const TDynamicMatrix<T>& m)
 {
     if (sz != m.sz)
         throw std::out_of_range("Matrix sizes must match");
     TDynamicMatrix result(sz);
     for (size_t i = 0; i < sz; ++i)
-        for (size_t j = i; j < sz; ++j)
-            result[i][j] = at(i, j) - m.at(i, j);
+        result[i].getVector() = at(i).getVector() - m.at(i).getVector();
     return result;
 }
 
 template<typename T>
-TDynamicMatrix<T> TDynamicMatrix<T>::operator*(const TDynamicMatrix& m)
+TDynamicMatrix<T> TDynamicMatrix<T>::operator*(const TDynamicMatrix<T>& m)
 {
     if (sz != m.sz)
         throw std::out_of_range("Matrix sizes must match");
