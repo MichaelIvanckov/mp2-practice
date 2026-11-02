@@ -111,6 +111,19 @@ private:
             if (j >= n) throw std::out_of_range("Index out of range");
             return row.at(j - offset);
         }
+
+        // Конверсия в TDynamicVector<T>: создаёт полную логическую строку
+        // длины n, где элементы ниже главной диагонали равны T().
+        operator TDynamicVector<T>() const {
+            TDynamicVector<T> result(n);
+            for (size_t j = 0; j < n; ++j)
+                result[j] = at(j);
+            return result;
+        }
+
+        // Доступ к исходному физическому вектору-строке (длины n - offset)
+        TDynamicVector<T>& getVector() noexcept { return row; }
+        const TDynamicVector<T>& getVector() const noexcept { return row; }
     };
 
     class ConstRowProxy {
@@ -126,6 +139,18 @@ private:
             if (j >= n) throw std::out_of_range("Index out of range");
             return row.at(j - offset);
         }
+
+        // Конверсия в TDynamicVector<T>: создаёт полную логическую строку
+        // длины n, где элементы ниже главной диагонали равны T().
+        operator TDynamicVector<T>() const {
+            TDynamicVector<T> result(n);
+            for (size_t j = 0; j < n; ++j)
+                result[j] = at(j);
+            return result;
+        }
+
+        // Доступ к исходному физическому вектору-строке (длины n - offset)
+        const TDynamicVector<T>& getVector() const noexcept { return row; }
     };
 
 public:
