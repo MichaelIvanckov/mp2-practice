@@ -48,7 +48,7 @@ TEST(TDynamicVector, copied_vector_has_its_own_memory)
 
 	v[0] = 100;
 
-	EXPECT_EQ(v, v1);
+	EXPECT_FALSE(v == v1);
 }
 
 TEST(TDynamicVector, can_get_size)
@@ -180,15 +180,15 @@ TEST(TDynamicVector, can_add_scalar_to_vector)
 TEST(TDynamicVector, can_subtract_scalar_from_vector)
 {
 	TDynamicVector<int> v(3);
-	v[0] = 10;
-	v[1] = 20;
-	v[2] = 30;
+	v[0] = 1;
+	v[1] = 2;
+	v[2] = 3;
+	TDynamicVector<int> v1(3);
+	v1[0] = -4;
+	v1[1] = -3;
+	v1[2] = -2;
 
-	TDynamicVector<int> result = v - 5; //todo
-
-	EXPECT_EQ(5, result[0]);
-	EXPECT_EQ(15, result[1]);
-	EXPECT_EQ(25, result[2]);
+	EXPECT_EQ(v1, v - 5);
 }
 
 TEST(TDynamicVector, can_multiply_scalar_by_vector)
@@ -197,12 +197,12 @@ TEST(TDynamicVector, can_multiply_scalar_by_vector)
 	v[0] = 1;
 	v[1] = 2;
 	v[2] = 3;
+	TDynamicVector<int> v1(3);
+	v1[0] = 2;
+	v1[1] = 4;
+	v1[2] = 6;
 
-	TDynamicVector<int> result = v * 2; //todo
-
-	EXPECT_EQ(2, result[0]);
-	EXPECT_EQ(4, result[1]);
-	EXPECT_EQ(6, result[2]);
+	EXPECT_EQ(v1, v * 2);
 }
 
 TEST(TDynamicVector, can_add_vectors_with_equal_size)
