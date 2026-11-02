@@ -134,7 +134,6 @@ private:
         const TDynamicVector<T>& row;
         size_t offset;
         size_t n;
-
         ConstRowProxy(const TDynamicVector<T>& r, size_t off, size_t size) : row(r), offset(off), n(size) {}
 
         size_t size() const { return n; }
@@ -164,21 +163,31 @@ public:
     TDynamicMatrix(size_t s = 1);
 
     using TDynamicVector<TDynamicVector<T>>::size;
-    using TDynamicVector<TDynamicVector<T>>::at; // доступ к строке с контролем
 
+    // Первый индекс: без проверок, UB при i >= sz (стандартная семантика operator[])
     RowProxy operator[](size_t i) {
-        return RowProxy(TDynamicVector<TDynamicVector<T>>::at(i), i, sz);
+        return RowProxy(pMem[i], i, sz);
     }
     ConstRowProxy operator[](size_t i) const {
-        return ConstRowProxy(TDynamicVector<TDynamicVector<T>>::at(i), i, sz);
+        return ConstRowProxy(pMem[i], i, sz);
+    }
+
+    // Первый индекс: с проверкой границы, возвращает прокси строки
+    RowProxy at(size_t i) {
+        if (i >= sz) throw std::out_of_range("Index out of range");
+        return RowProxy(pMem[i], i, sz);
+    }
+    ConstRowProxy at(size_t i) const {
+        if (i >= sz) throw std::out_of_range("Index out of range");
+        return ConstRowProxy(pMem[i], i, sz);
     }
 
     // доступ к элементу с контролем по двум индексам
     T& at(size_t i, size_t j) {
-        return (*this)[i].at(j);
+        return at(i).at(j);
     }
     const T& at(size_t i, size_t j) const {
-        return (*this)[i].at(j);
+        return at(i).at(j);
     }
 
     // сравнение
