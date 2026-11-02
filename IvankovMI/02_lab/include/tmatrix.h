@@ -447,7 +447,7 @@ bool TDynamicMatrix<T>::operator==(const TDynamicMatrix& m) const noexcept
 }
 
 template<typename T>
-TDynamicMatrix<T> TDynamicMatrix<T>::operator*(const T& val)
+TDynamicMatrix<T> TDynamicMatrix<T>::operator*(const T& val) //todo
 {
     TDynamicMatrix result(sz);
     for (size_t i = 0; i < sz; ++i)
@@ -473,7 +473,7 @@ TDynamicVector<T> TDynamicMatrix<T>::operator*(const TDynamicVector<T>& v)
 }
 
 template<typename T>
-TDynamicMatrix<T> TDynamicMatrix<T>::operator+(const TDynamicMatrix& m)
+TDynamicMatrix<T> TDynamicMatrix<T>::operator+(const TDynamicMatrix& m) //todo
 {
     if (sz != m.sz)
         throw std::out_of_range("Matrix sizes must match");
@@ -485,7 +485,7 @@ TDynamicMatrix<T> TDynamicMatrix<T>::operator+(const TDynamicMatrix& m)
 }
 
 template<typename T>
-TDynamicMatrix<T> TDynamicMatrix<T>::operator-(const TDynamicMatrix& m)
+TDynamicMatrix<T> TDynamicMatrix<T>::operator-(const TDynamicMatrix& m) //todo
 {
     if (sz != m.sz)
         throw std::out_of_range("Matrix sizes must match");
