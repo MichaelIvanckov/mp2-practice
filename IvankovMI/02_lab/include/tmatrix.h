@@ -98,9 +98,12 @@ private:
         size_t offset;
         size_t n;
         RowProxy(TDynamicVector<T>& r, size_t off, size_t size) : row(r), offset(off), n(size) {}
+
         size_t size() const { return n; }
+
         T& operator[](size_t j) { return row[j - offset]; }
         const T& operator[](size_t j) const { return row[j - offset]; }
+
         T& at(size_t j) {
             if (j < offset) throw std::out_of_range("Index below main diagonal");
             if (j >= n) throw std::out_of_range("Index out of range");
@@ -131,9 +134,13 @@ private:
         const TDynamicVector<T>& row;
         size_t offset;
         size_t n;
+
         ConstRowProxy(const TDynamicVector<T>& r, size_t off, size_t size) : row(r), offset(off), n(size) {}
+
         size_t size() const { return n; }
+
         const T& operator[](size_t j) const { return row[j - offset]; }
+
         const T& at(size_t j) const {
             if (j < offset) { static const T def = T(); return def; }
             if (j >= n) throw std::out_of_range("Index out of range");
