@@ -209,6 +209,7 @@ TEST(TDynamicVector, can_add_vectors_with_equal_size)
 {
 	TDynamicVector<int> v1(3);
 	TDynamicVector<int> v2(3);
+	TDynamicVector<int> v3(3);
 
 	v1[0] = 1;
 	v1[1] = 2;
@@ -218,11 +219,11 @@ TEST(TDynamicVector, can_add_vectors_with_equal_size)
 	v2[1] = 5;
 	v2[2] = 6;
 
-	TDynamicVector<int> result = v1 + v2; //todo
+	v3[0] = 5;
+	v3[1] = 7;
+	v3[2] = 9;
 
-	EXPECT_EQ(5, result[0]);
-	EXPECT_EQ(7, result[1]);
-	EXPECT_EQ(9, result[2]);
+	EXPECT_EQ(v1 + v2, v3);
 }
 
 TEST(TDynamicVector, cant_add_vectors_with_not_equal_size)
@@ -237,20 +238,21 @@ TEST(TDynamicVector, can_subtract_vectors_with_equal_size)
 {
 	TDynamicVector<int> v1(3);
 	TDynamicVector<int> v2(3);
+	TDynamicVector<int> v3(3);
 
-	v1[0] = 10;
-	v1[1] = 20;
-	v1[2] = 30;
+	v1[0] = 1;
+	v1[1] = 2;
+	v1[2] = 3;
 
-	v2[0] = 1;
-	v2[1] = 2;
-	v2[2] = 3;
+	v2[0] = 4;
+	v2[1] = 5;
+	v2[2] = 6;
 
-	TDynamicVector<int> result = v1 - v2; //todo
+	v3[0] = 5;
+	v3[1] = 7;
+	v3[2] = 9;
 
-	EXPECT_EQ(9, result[0]);
-	EXPECT_EQ(18, result[1]);
-	EXPECT_EQ(27, result[2]);
+	EXPECT_EQ(v3 - v2, v1);
 }
 
 TEST(TDynamicVector, cant_subtract_vectors_with_not_equal_size)
