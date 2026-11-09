@@ -28,8 +28,8 @@ protected:
 public:
     explicit TDynamicVector(size_t size = 1) : sz(size)
     {
-        if (sz == 0)
-            throw out_of_range("Vector size should be greater than zero");
+        if (sz == 0 || sz > MAX_VECTOR_SIZE)
+            throw out_of_range("Vector size should be greater than zero and less than MAX_VECTOR_SIZE");
         pMem = new T[sz]();// {}; // У типа T д.б. констуктор по умолчанию
     }
     TDynamicVector(T* arr, size_t s) : sz(s)
@@ -67,7 +67,7 @@ public:
     // векторные операции
     TDynamicVector operator+(const TDynamicVector& v) const;
     TDynamicVector operator-(const TDynamicVector& v) const;
-    T operator*(const TDynamicVector& v) const noexcept(noexcept(T()));      //? удаленить noexcept т. к. есть тест с именем «cant_multiply_vectors_with_not_equal_size» ?
+    T operator*(const TDynamicVector& v) const;      //? удаленить noexcept т. к. есть тест с именем «cant_multiply_vectors_with_not_equal_size» ?
 
     friend void swap(TDynamicVector& lhs, TDynamicVector& rhs) noexcept
     {
@@ -305,7 +305,7 @@ TDynamicVector<T> TDynamicVector<T>::operator-(const TDynamicVector<T>& v) const
 }
 
 template<typename T>
-T TDynamicVector<T>::operator*(const TDynamicVector<T>& v) const noexcept(noexcept(T()))
+T TDynamicVector<T>::operator*(const TDynamicVector<T>& v) const 
 {
     if (sz != v.sz)
         throw std::out_of_range("Vector sizes must match");
