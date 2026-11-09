@@ -7,6 +7,7 @@
 #ifndef __TDynamicMatrix_H__
 #define __TDynamicMatrix_H__
 
+#include <cassert>
 #include <iostream>
 #include <utility>
 #include <stdexcept>
@@ -59,14 +60,14 @@ public:
     bool operator!=(const TDynamicVector& v) const noexcept;
 
     // скалярные операции
-    TDynamicVector operator+(T val);
-    TDynamicVector operator-(T val);
-    TDynamicVector operator*(T val);
+    TDynamicVector operator+(T val) const;
+    TDynamicVector operator-(T val) const;
+    TDynamicVector operator*(T val) const;
 
     // векторные операции
-    TDynamicVector operator+(const TDynamicVector& v);
-    TDynamicVector operator-(const TDynamicVector& v);
-    T operator*(const TDynamicVector& v) noexcept(noexcept(T()));      // удалено noexcept т. к. был тест с именем «cant_multiply_vectors_with_not_equal_size»
+    TDynamicVector operator+(const TDynamicVector& v) const;
+    TDynamicVector operator-(const TDynamicVector& v) const;
+    T operator*(const TDynamicVector& v) const noexcept(noexcept(T()));      // удалено noexcept т. к. был тест с именем «cant_multiply_vectors_with_not_equal_size»
 
     friend void swap(TDynamicVector& lhs, TDynamicVector& rhs) noexcept
     {
@@ -344,7 +345,7 @@ TDynamicVector<T> TDynamicVector<T>::operator+()
 }
 
 template<typename T>
-TDynamicVector<T> TDynamicVector<T>::operator-()
+TDynamicVector<T> TDynamicVector<T>::operator+(T val) const
 {
     TDynamicVector result(sz);
     for (size_t i = 0; i < sz; ++i)
@@ -353,7 +354,7 @@ TDynamicVector<T> TDynamicVector<T>::operator-()
 }*/
 
 template<typename T>
-TDynamicVector<T> TDynamicVector<T>::operator+(T val)
+TDynamicVector<T> TDynamicVector<T>::operator+(T val) const
 {
     TDynamicVector result(sz);
     for (size_t i = 0; i < sz; ++i)
@@ -362,13 +363,13 @@ TDynamicVector<T> TDynamicVector<T>::operator+(T val)
 }
 
 template<typename T>
-TDynamicVector<T> TDynamicVector<T>::operator-(T val) // todo v+(-val)
+TDynamicVector<T> TDynamicVector<T>::operator-(T val) const // todo v+(-val)
 {
     return (*this) + (-val);
 }
 
 template<typename T>
-TDynamicVector<T> TDynamicVector<T>::operator*(T val)
+TDynamicVector<T> TDynamicVector<T>::operator*(T val) const
 {
     TDynamicVector result(sz);
     for (size_t i = 0; i < sz; ++i)
@@ -377,7 +378,7 @@ TDynamicVector<T> TDynamicVector<T>::operator*(T val)
 }
 
 template<typename T>
-TDynamicVector<T> TDynamicVector<T>::operator+(const TDynamicVector<T>& v)
+TDynamicVector<T> TDynamicVector<T>::operator+(const TDynamicVector<T>& v) const
 {
     if (sz != v.sz)
         throw std::out_of_range("Vector sizes must match");
@@ -388,13 +389,13 @@ TDynamicVector<T> TDynamicVector<T>::operator+(const TDynamicVector<T>& v)
 }
 
 template<typename T>
-TDynamicVector<T> TDynamicVector<T>::operator-(const TDynamicVector<T>& v) //todo v+v1*(-1)
+TDynamicVector<T> TDynamicVector<T>::operator-(const TDynamicVector<T>& v) const //todo v+v1*(-1)
 {
     return (*this) + (v * static_cast<T>(-1));
 }
 
 template<typename T>
-T TDynamicVector<T>::operator*(const TDynamicVector<T>& v) noexcept(noexcept(T()))
+T TDynamicVector<T>::operator*(const TDynamicVector<T>& v) const noexcept(noexcept(T()))
 {
     if (sz != v.sz)
         throw std::out_of_range("Vector sizes must match");
@@ -404,120 +405,4 @@ T TDynamicVector<T>::operator*(const TDynamicVector<T>& v) noexcept(noexcept(T()
     return result;
 }
 
-/*
-// Явные инстанцирования для типов, используемых в тестах и матрице
-template class TDynamicVector<int>;
-template class TDynamicVector<double>;
-template class TDynamicVector<float>;
-template class TDynamicVector<long long>;
-
-template class TDynamicVector<TDynamicVector<int>>;
-template class TDynamicVector<TDynamicVector<double>>;
-template class TDynamicVector<TDynamicVector<float>>;
-template class TDynamicVector<TDynamicVector<long long>>;
-*/
-
-
-
-/*
-// ---------- TDynamicMatrix ----------
-
-template<typename T>
-size_t TDynamicMatrix<T>::checkSize(size_t s)
-{
-    if (s == 0 || s > MAX_MATRIX_SIZE)
-        throw std::out_of_range("Matrix size should be in (0, MAX_MATRIX_SIZE]");
-    return s;
-}
-
-template<typename T>
-TDynamicMatrix<T>::TDynamicMatrix(size_t s)
-    : TDynamicVector<TDynamicVector<T>>(checkSize(s))
-{
-    for (size_t i = 0; i < sz; ++i)
-        pMem[i] = TDynamicVector<T>(sz - i);
-}
-
-template<typename T>
-bool TDynamicMatrix<T>::operator==(const TDynamicMatrix<T>& m) const noexcept
-{
-    if (sz != m.sz)
-        return false;
-    for (size_t i = 0; i < sz; ++i)
-        for (size_t j = i; j < sz; ++j)
-            if (at(i, j) != m.at(i, j))
-                return false;
-    return true;
-}
-
-template<typename T>
-TDynamicMatrix<T> TDynamicMatrix<T>::operator*(const T& val) const
-{
-    TDynamicMatrix result(sz);
-    for (size_t i = 0; i < sz; ++i)
-        result[i] = pMem[i] * val;
-    return result;
-}
-
-template<typename T>
-TDynamicVector<T> TDynamicMatrix<T>::operator*(const TDynamicVector<T>& v)
-{
-    if (v.size() != sz)
-        throw std::out_of_range("Matrix and vector sizes must match");
-    TDynamicVector<T> result(sz);
-    for (size_t i = 0; i < sz; ++i)
-    {
-        T sum = T();
-        for (size_t j = i; j < sz; ++j)
-            sum = sum + at(i, j) * v[j];
-        result[i] = sum;
-    }
-    return result;
-}
-
-template<typename T>
-TDynamicMatrix<T> TDynamicMatrix<T>::operator+(const TDynamicMatrix<T>& m)
-{
-    if (sz != m.sz)
-        throw std::out_of_range("Matrix sizes must match");
-    TDynamicMatrix result(sz);
-    for (size_t i = 0; i < sz; ++i)
-        result[i].getVector() = at(i).getVector() + m.at(i).getVector();
-    return result;
-}
-
-template<typename T>
-TDynamicMatrix<T> TDynamicMatrix<T>::operator-(const TDynamicMatrix<T>& m)
-{
-    if (sz != m.sz)
-        throw std::out_of_range("Matrix sizes must match");
-    TDynamicMatrix result(sz);
-    for (size_t i = 0; i < sz; ++i)
-        result[i].getVector() = at(i).getVector() - m.at(i).getVector();
-    return result;
-}
-
-template<typename T>
-TDynamicMatrix<T> TDynamicMatrix<T>::operator*(const TDynamicMatrix<T>& m)
-{
-    if (sz != m.sz)
-        throw std::out_of_range("Matrix sizes must match");
-    TDynamicMatrix result(sz);
-    for (size_t i = 0; i < sz; ++i)
-        for (size_t j = i; j < sz; ++j)
-        {
-            T sum = T();
-            for (size_t k = i; k <= j; ++k)
-                sum = sum + at(i, k) * m.at(k, j);
-            result[i][j] = sum;
-        }
-    return result;
-}
-
-// Явные инстанцирования для TDynamicMatrix
-template class TDynamicMatrix<int>;
-template class TDynamicMatrix<double>;
-template class TDynamicMatrix<float>;
-template class TDynamicMatrix<long long>;
-*/
 #endif
