@@ -67,7 +67,7 @@ public:
     // векторные операции
     TDynamicVector operator+(const TDynamicVector& v) const;
     TDynamicVector operator-(const TDynamicVector& v) const;
-    T operator*(const TDynamicVector& v) const noexcept(noexcept(T()));      // удалено noexcept т. к. был тест с именем «cant_multiply_vectors_with_not_equal_size»
+    T operator*(const TDynamicVector& v) const noexcept(noexcept(T()));      //? удаленить noexcept т. к. есть тест с именем «cant_multiply_vectors_with_not_equal_size» ?
 
     friend void swap(TDynamicVector& lhs, TDynamicVector& rhs) noexcept
     {
@@ -363,7 +363,7 @@ TDynamicVector<T> TDynamicVector<T>::operator+(T val) const
 }
 
 template<typename T>
-TDynamicVector<T> TDynamicVector<T>::operator-(T val) const // todo v+(-val)
+TDynamicVector<T> TDynamicVector<T>::operator-(T val) const // todo v+(-val)  СДЕЛАНО!
 {
     return (*this) + (-val);
 }
@@ -389,7 +389,7 @@ TDynamicVector<T> TDynamicVector<T>::operator+(const TDynamicVector<T>& v) const
 }
 
 template<typename T>
-TDynamicVector<T> TDynamicVector<T>::operator-(const TDynamicVector<T>& v) const //todo v+v1*(-1)
+TDynamicVector<T> TDynamicVector<T>::operator-(const TDynamicVector<T>& v) const //todo v+v1*(-1)  СДЕЛАНО!
 {
     return (*this) + (v * static_cast<T>(-1));
 }
