@@ -91,155 +91,65 @@ public:
 };
 
 
-/*
 // Динамическая матрица - 
 // шаблонная матрица на динамической памяти
-// Хранит только верхний треугольник: строка i имеет длину sz - i
 template<typename T>
 class TDynamicMatrix : private TDynamicVector<TDynamicVector<T>>
 {
     using TDynamicVector<TDynamicVector<T>>::pMem;
     using TDynamicVector<TDynamicVector<T>>::sz;
-private:
-    static size_t checkSize(size_t s);
-
-    // Прокси-строка для доступа к элементам верхнего треугольника с сохранением синтаксиса m[i][j]
-    class RowProxy {
-    public:
-        TDynamicVector<T>& row;
-        size_t offset;
-        size_t n;
-        RowProxy(TDynamicVector<T>& r, size_t off, size_t size) : row(r), offset(off), n(size) {}
-
-        size_t size() const { return n; }
-
-        T& operator[](size_t j) { return row[j - offset]; }
-        const T& operator[](size_t j) const { return row[j - offset]; }
-
-        T& at(size_t j) {
-            if (j < offset) throw std::out_of_range("Index below main diagonal");
-            if (j >= n) throw std::out_of_range("Index out of range");
-            return row.at(j - offset);
-        }
-        const T& at(size_t j) const {
-            if (j < offset) { static const T def = T(); return def; }
-            if (j >= n) throw std::out_of_range("Index out of range");
-            return row.at(j - offset);
-        }
-
-        // Конверсия в TDynamicVector<T>: создаёт полную логическую строку
-        // длины n, где элементы ниже главной диагонали равны T().
-        operator TDynamicVector<T>() const {
-            TDynamicVector<T> result(n);
-            for (size_t j = 0; j < n; ++j)
-                result[j] = at(j);
-            return result;
-        }
-
-        // Доступ к исходному физическому вектору-строке (длины n - offset)
-        TDynamicVector<T>& getVector() noexcept { return row; }
-        const TDynamicVector<T>& getVector() const noexcept { return row; }
-    };
-
-    class ConstRowProxy {
-    public:
-        const TDynamicVector<T>& row;
-        size_t offset;
-        size_t n;
-        ConstRowProxy(const TDynamicVector<T>& r, size_t off, size_t size) : row(r), offset(off), n(size) {}
-
-        size_t size() const { return n; }
-
-        const T& operator[](size_t j) const { return row[j - offset]; }
-
-        const T& at(size_t j) const {
-            if (j < offset) { static const T def = T(); return def; }
-            if (j >= n) throw std::out_of_range("Index out of range");
-            return row.at(j - offset);
-        }
-
-        // Конверсия в TDynamicVector<T>: создаёт полную логическую строку
-        // длины n, где элементы ниже главной диагонали равны T().
-        operator TDynamicVector<T>() const {
-            TDynamicVector<T> result(n);
-            for (size_t j = 0; j < n; ++j)
-                result[j] = at(j);
-            return result;
-        }
-
-        // Доступ к исходному физическому вектору-строке (длины n - offset)
-        const TDynamicVector<T>& getVector() const noexcept { return row; }
-    };
-
 public:
-    TDynamicMatrix(size_t s = 1);
-
-    using TDynamicVector<TDynamicVector<T>>::size;
-
-    // Первый индекс: без проверок, UB при i >= sz (стандартная семантика operator[])
-    RowProxy operator[](size_t i) {
-        return RowProxy(pMem[i], i, sz);
-    }
-    ConstRowProxy operator[](size_t i) const {
-        return ConstRowProxy(pMem[i], i, sz);
+    TDynamicMatrix(size_t s = 1) : TDynamicVector<TDynamicVector<T>>(s)
+    {
+        for (size_t i = 0; i < sz; i++)
+            pMem[i] = TDynamicVector<T>(sz);
     }
 
-    // Первый индекс: с проверкой границы, возвращает прокси строки
-    RowProxy at(size_t i) {
-        if (i >= sz) throw std::out_of_range("Index out of range");
-        return RowProxy(pMem[i], i, sz);
-    }
-    ConstRowProxy at(size_t i) const {
-        if (i >= sz) throw std::out_of_range("Index out of range");
-        return ConstRowProxy(pMem[i], i, sz);
-    }
-
-    // доступ к элементу с контролем по двум индексам
-    T& at(size_t i, size_t j) {
-        return at(i).at(j);
-    }
-    const T& at(size_t i, size_t j) const {
-        return at(i).at(j);
-    }
+    using TDynamicVector<TDynamicVector<T>>::operator[];
 
     // сравнение
-    bool operator==(const TDynamicMatrix& m) const noexcept;
+    bool operator==(const TDynamicMatrix& m) const noexcept
+    {
+        throw "Method is not implemented";
+    }
 
     // матрично-скалярные операции
-    TDynamicMatrix operator*(const T& val) const;
+    TDynamicMatrix operator*(const T& val)
+    {
+        throw "Method is not implemented";
+    }
 
     // матрично-векторные операции
-    TDynamicVector<T> operator*(const TDynamicVector<T>& v);
+    TDynamicVector<T> operator*(const TDynamicVector<T>& v)
+    {
+        throw "Method is not implemented";
+    }
 
     // матрично-матричные операции
-    TDynamicMatrix operator+(const TDynamicMatrix& m);
-    TDynamicMatrix operator-(const TDynamicMatrix& m);
-    TDynamicMatrix operator*(const TDynamicMatrix& m);
+    TDynamicMatrix operator+(const TDynamicMatrix& m)
+    {
+        throw "Method is not implemented";
+    }
+    TDynamicMatrix operator-(const TDynamicMatrix& m)
+    {
+        throw "Method is not implemented";
+    }
+    TDynamicMatrix operator*(const TDynamicMatrix& m)
+    {
+        throw "Method is not implemented";
+    }
 
     // ввод/вывод
     friend istream& operator>>(istream& istr, TDynamicMatrix& v)
     {
-        for (size_t i = 0; i < v.sz; ++i)
-            for (size_t j = 0; j < v.sz; ++j) {
-                T val;
-                istr >> val;
-                if (j >= i)
-                    v[i][j] = val;
-                // значения ниже диагонали игнорируются
-            }
-        return istr;
+        throw "Method is not implemented";
     }
     friend ostream& operator<<(ostream& ostr, const TDynamicMatrix& v)
     {
-        for (size_t i = 0; i < v.sz; ++i) {
-            for (size_t j = 0; j < v.sz; ++j)
-                ostr << v.at(i, j) << ' ';
-            ostr << '\n';
-        }
-        return ostr;
+        throw "Method is not implemented";
     }
 };
-*/
+
 
 
 // ---------- Реализация: -------------
