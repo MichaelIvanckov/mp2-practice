@@ -25,7 +25,7 @@ protected:
     size_t sz;
     T* pMem;
 public:
-    TDynamicVector(size_t size = 1);
+    explicit TDynamicVector(size_t size = 1);
     TDynamicVector(T* arr, size_t s);
     TDynamicVector(const TDynamicVector& v);
     TDynamicVector(TDynamicVector&& v) noexcept;
@@ -84,6 +84,7 @@ public:
 };
 
 
+/*
 // Динамическая матрица - 
 // шаблонная матрица на динамической памяти
 // Хранит только верхний треугольник: строка i имеет длину sz - i
@@ -231,6 +232,7 @@ public:
         return ostr;
     }
 };
+*/
 
 
 // ---------- Реализация: -------------
@@ -404,7 +406,7 @@ TDynamicVector<T> TDynamicVector<T>::operator-(const TDynamicVector<T>& v) //tod
 }
 
 template<typename T>
-T TDynamicVector<T>::operator*(const TDynamicVector<T>& v)
+T TDynamicVector<T>::operator*(const TDynamicVector<T>& v) noexcept(noexcept(T()))
 {
     if (sz != v.sz)
         throw std::out_of_range("Vector sizes must match");
@@ -414,6 +416,7 @@ T TDynamicVector<T>::operator*(const TDynamicVector<T>& v)
     return result;
 }
 
+/*
 // Явные инстанцирования для типов, используемых в тестах и матрице
 template class TDynamicVector<int>;
 template class TDynamicVector<double>;
@@ -424,9 +427,11 @@ template class TDynamicVector<TDynamicVector<int>>;
 template class TDynamicVector<TDynamicVector<double>>;
 template class TDynamicVector<TDynamicVector<float>>;
 template class TDynamicVector<TDynamicVector<long long>>;
+*/
 
 
 
+/*
 // ---------- TDynamicMatrix ----------
 
 template<typename T>
@@ -526,5 +531,5 @@ template class TDynamicMatrix<int>;
 template class TDynamicMatrix<double>;
 template class TDynamicMatrix<float>;
 template class TDynamicMatrix<long long>;
-
+*/
 #endif
