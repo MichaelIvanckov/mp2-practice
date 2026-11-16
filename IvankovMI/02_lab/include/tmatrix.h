@@ -110,43 +110,43 @@ public:
     }
 
     using TDynamicVector<TDynamicVector<T>>::operator[];
-    using TDynamicVector<TDynamicVector<T>>::size;          // !! добавлено, т. к. тесты предполагают проверку размера матрицы
+    using TDynamicVector<TDynamicVector<T>>::size;           // !! добавлено, т. к. тесты предполагают проверку размера матрицы
 
     // сравнение
-    using TDynamicVector<TDynamicVector<T>>::operator==;    // !! заменено на пробрасывание, это не меняет интерфейс
+    using TDynamicVector<TDynamicVector<T>>::operator==;     // !! заменено на пробрасывание, это не меняет интерфейс
 
     // матрично-скалярные операции
-    TDynamicMatrix operator*(const T& val)
+    TDynamicMatrix<T> operator*(const T& val) const          // !! отсутствовал "const" и "<T>" после возвр. типа
     {
         throw "Method is not implemented";
     }
 
     // матрично-векторные операции
-    TDynamicVector<T> operator*(const TDynamicVector<T>& v)
+    TDynamicVector<T> operator*(const TDynamicVector<T>& v) const    // !! отсутствовал "const"
     {
         throw "Method is not implemented";
     }
 
     // матрично-матричные операции
-    TDynamicMatrix operator+(const TDynamicMatrix<T>& m)       // !! отсутствовал "<T>" после типа аргумента
+    TDynamicMatrix<T> operator+(const TDynamicMatrix<T>& m) const    // !! отсутствовал "const" и "<T>" после типа аргумента и возвр. типа
     {
         throw "Method is not implemented";
     }
-    TDynamicMatrix operator-(const TDynamicMatrix& m)
+    TDynamicMatrix<T> operator-(const TDynamicMatrix<T>& m) const    // !! отсутствовал "const" и "<T>" после типа аргумента и возвр. типа
     {
         throw "Method is not implemented";
     }
-    TDynamicMatrix operator*(const TDynamicMatrix& m)
+    TDynamicMatrix<T> operator*(const TDynamicMatrix<T>& m) const    // !! отсутствовал    // !! отсутствовал "const" "<T>" после типа аргумента и возвр. типа
     {
         throw "Method is not implemented";
     }
 
     // ввод/вывод
-    friend istream& operator>>(istream& istr, TDynamicMatrix& v)
+    friend istream& operator>>(istream& istr, TDynamicMatrix<T>& v)         // !! отсутствовал "<T>" после типа аргумента
     {
         throw "Method is not implemented";
     }
-    friend ostream& operator<<(ostream& ostr, const TDynamicMatrix& v)
+    friend ostream& operator<<(ostream& ostr, const TDynamicMatrix<T>& v)   // !! отсутствовал "<T>" после типа аргумента
     {
         throw "Method is not implemented";
     }
