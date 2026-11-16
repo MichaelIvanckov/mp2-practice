@@ -4,6 +4,10 @@
 //
 //
 
+// в некоторых местах интерфейс изменен студентом, т. к. не соответствует соглашению 
+// или не подходит под специфику конкретной лабораторной работы 
+// (отмечено символом "!!" перед комментарием и содержит пояснения)
+
 #ifndef __TDynamicMatrix_H__
 #define __TDynamicMatrix_H__
 
@@ -26,7 +30,7 @@ protected:
     size_t sz;
     T* pMem;
 public:
-    explicit TDynamicVector(size_t size = 1) : sz(size)
+    explicit TDynamicVector(size_t size = 1) : sz(size)        // !! добавлен explicit, т. к. без него некоторые тесты не собирались + это логично с т. з. пользователя и соответствует соглашениям
     {
         if (sz == 0 || sz > MAX_VECTOR_SIZE)
             throw out_of_range("Vector size should be greater than zero and less than MAX_VECTOR_SIZE");
@@ -38,12 +42,12 @@ public:
         pMem = new T[sz];
         std::copy(arr, arr + sz, pMem);
     }
-    TDynamicVector(const TDynamicVector& v);
-    TDynamicVector(TDynamicVector&& v) noexcept;
+    TDynamicVector(const TDynamicVector<T>& v);                // !! отсутствовал "<T>" после типа аргумента
+    TDynamicVector(TDynamicVector<T>&& v) noexcept;            // !! отсутствовал "<T>" после типа аргумента
     ~TDynamicVector();
 
-    TDynamicVector& operator=(const TDynamicVector& v);
-    TDynamicVector& operator=(TDynamicVector&& v) noexcept;
+    TDynamicVector& operator=(const TDynamicVector<T>& v);     // !! отсутствовал "<T>" после типа аргумента
+    TDynamicVector& operator=(TDynamicVector<T>&& v) noexcept; // !! отсутствовал "<T>" после типа аргумента
 
     size_t size() const noexcept { return sz; }
 
@@ -56,33 +60,33 @@ public:
     const T& at(size_t ind) const;
 
     // сравнение
-    bool operator==(const TDynamicVector& v) const noexcept;
-    bool operator!=(const TDynamicVector& v) const noexcept;
+    bool operator==(const TDynamicVector<T>& v) const noexcept;  // !! отсутствовал "<T>" после типа аргумента 
+    bool operator!=(const TDynamicVector<T>& v) const noexcept;  // !! отсутствовал "<T>" после типа аргумента
 
     // скалярные операции
-    TDynamicVector operator+(T val) const;
-    TDynamicVector operator-(T val) const;
-    TDynamicVector operator*(T val) const;
+    TDynamicVector operator+(T val) const;                       // !! отсутствовал "const"
+    TDynamicVector operator-(T val) const;                       // !! отсутствовал "const"
+    TDynamicVector operator*(T val) const;                       // !! отсутствовал "const"
 
     // векторные операции
-    TDynamicVector operator+(const TDynamicVector& v) const;
-    TDynamicVector operator-(const TDynamicVector& v) const;
-    T operator*(const TDynamicVector& v) const;      //? удаленить noexcept т. к. есть тест с именем «cant_multiply_vectors_with_not_equal_size» ?
+    TDynamicVector operator+(const TDynamicVector<T>& v) const;    // !! отсутствовал "const" и "<T>"
+    TDynamicVector operator-(const TDynamicVector<T>& v) const;    // !! отсутствовал "const" и "<T>"
+    T operator*(const TDynamicVector<T>& v) const;    // !! удалено "noexcept(noexcept(T()))" т. к. есть тест с именем «cant_multiply_vectors_with_not_equal_size», предполагающий выбрасывание исключения; отсутствовал "const" и "<T>"
 
-    friend void swap(TDynamicVector& lhs, TDynamicVector& rhs) noexcept
+    friend void swap(TDynamicVector<T>& lhs, TDynamicVector<T>& rhs) noexcept   // !! отсутствовал "<T>" после типа аргумента
     {
         std::swap(lhs.sz, rhs.sz);
         std::swap(lhs.pMem, rhs.pMem);
     }
 
     // ввод/вывод
-    friend istream& operator>>(istream& istr, TDynamicVector& v)
+    friend istream& operator>>(istream& istr, TDynamicVector<T>& v)             // !! отсутствовал "<T>" после типа аргумента
     {
         for (size_t i = 0; i < v.sz; i++)
             istr >> v.pMem[i]; // требуется оператор>> для типа T
         return istr;
     }
-    friend ostream& operator<<(ostream& ostr, const TDynamicVector& v)
+    friend ostream& operator<<(ostream& ostr, const TDynamicVector<T>& v)       // !! отсутствовал "<T>" после типа аргумента
     {
         for (size_t i = 0; i < v.sz; i++)
             ostr << v.pMem[i] << ' '; // требуется оператор<< для типа T
@@ -106,12 +110,10 @@ public:
     }
 
     using TDynamicVector<TDynamicVector<T>>::operator[];
+    using TDynamicVector<TDynamicVector<T>>::size;           // !! добавлено, т. к. тесты предполагают проверку размера матрицы
 
     // сравнение
-    bool operator==(const TDynamicMatrix& m) const noexcept
-    {
-        throw "Method is not implemented";
-    }
+    using TDynamicVector<TDynamicVector<T>>::operator==;     // !! заменено на пробрасывание, это не меняет интерфейс
 
     // матрично-скалярные операции
     TDynamicMatrix operator*(const T& val)
@@ -126,7 +128,7 @@ public:
     }
 
     // матрично-матричные операции
-    TDynamicMatrix operator+(const TDynamicMatrix& m)
+    TDynamicMatrix operator+(const TDynamicMatrix<T>& m)       // !! отсутствовал "<T>" после типа аргумента
     {
         throw "Method is not implemented";
     }
