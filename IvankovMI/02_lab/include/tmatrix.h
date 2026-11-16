@@ -46,8 +46,8 @@ public:
     TDynamicVector(TDynamicVector<T>&& v) noexcept;            // !! отсутствовал "<T>" после типа аргумента
     ~TDynamicVector();
 
-    TDynamicVector& operator=(const TDynamicVector<T>& v);     // !! отсутствовал "<T>" после типа аргумента
-    TDynamicVector& operator=(TDynamicVector<T>&& v) noexcept; // !! отсутствовал "<T>" после типа аргумента
+    TDynamicVector<T>& operator=(const TDynamicVector<T>& v);     // !! отсутствовал "<T>" после типа аргумента и возвр. типа
+    TDynamicVector<T>& operator=(TDynamicVector<T>&& v) noexcept; // !! отсутствовал "<T>" после типа аргумента и возвр. типа
 
     size_t size() const noexcept { return sz; }
 
@@ -64,13 +64,13 @@ public:
     bool operator!=(const TDynamicVector<T>& v) const noexcept;  // !! отсутствовал "<T>" после типа аргумента
 
     // скалярные операции
-    TDynamicVector operator+(T val) const;                       // !! отсутствовал "const"
-    TDynamicVector operator-(T val) const;                       // !! отсутствовал "const"
-    TDynamicVector operator*(T val) const;                       // !! отсутствовал "const"
+    TDynamicVector<T> operator+(T val) const;                       // !! отсутствовал "const" и "<T>" после возвр. типа
+    TDynamicVector<T> operator-(T val) const;                       // !! отсутствовал "const" и "<T>" после возвр. типа
+    TDynamicVector<T> operator*(T val) const;                       // !! отсутствовал "const" и "<T>" после возвр. типа
 
     // векторные операции
-    TDynamicVector operator+(const TDynamicVector<T>& v) const;    // !! отсутствовал "const" и "<T>"
-    TDynamicVector operator-(const TDynamicVector<T>& v) const;    // !! отсутствовал "const" и "<T>"
+    TDynamicVector<T> operator+(const TDynamicVector<T>& v) const;    // !! отсутствовал "const" и "<T>"
+    TDynamicVector<T> operator-(const TDynamicVector<T>& v) const;    // !! отсутствовал "const" и "<T>"
     T operator*(const TDynamicVector<T>& v) const;    // !! удалено "noexcept(noexcept(T()))" т. к. есть тест с именем «cant_multiply_vectors_with_not_equal_size», предполагающий выбрасывание исключения; отсутствовал "const" и "<T>"
 
     friend void swap(TDynamicVector<T>& lhs, TDynamicVector<T>& rhs) noexcept   // !! отсутствовал "<T>" после типа аргумента
@@ -110,10 +110,10 @@ public:
     }
 
     using TDynamicVector<TDynamicVector<T>>::operator[];
-    using TDynamicVector<TDynamicVector<T>>::size;           // !! добавлено, т. к. тесты предполагают проверку размера матрицы
+    using TDynamicVector<TDynamicVector<T>>::size;          // !! добавлено, т. к. тесты предполагают проверку размера матрицы
 
     // сравнение
-    using TDynamicVector<TDynamicVector<T>>::operator==;     // !! заменено на пробрасывание, это не меняет интерфейс
+    using TDynamicVector<TDynamicVector<T>>::operator==;    // !! заменено на пробрасывание, это не меняет интерфейс
 
     // матрично-скалярные операции
     TDynamicMatrix operator*(const T& val)
