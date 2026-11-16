@@ -112,6 +112,10 @@ public:
     using TDynamicVector<TDynamicVector<T>>::operator[];
     using TDynamicVector<TDynamicVector<T>>::size;           // !! добавлено, т. к. тесты предполагают проверку размера матрицы
 
+    // !! индексация с контролем
+    T& at(size_t i, size_t j) { throw "Method is not implemented"; }                               // !! добавлен новый метод для корректной работы программы-примера (специфика верхнетреугольных матриц)
+    const T& at(size_t i, size_t j) const { throw "Method is not implemented"; }                   // !! добавлен новый метод для корректной работы программы-примера (специфика верхнетреугольных матриц)
+
     // сравнение
     using TDynamicVector<TDynamicVector<T>>::operator==;     // !! заменено на пробрасывание, это не меняет интерфейс
 
@@ -136,7 +140,7 @@ public:
     {
         throw "Method is not implemented";
     }
-    TDynamicMatrix<T> operator*(const TDynamicMatrix<T>& m) const    // !! отсутствовал    // !! отсутствовал "const" "<T>" после типа аргумента и возвр. типа
+    TDynamicMatrix<T> operator*(const TDynamicMatrix<T>& m) const    // !! отсутствовал "const" и "<T>" после типа аргумента и возвр. типа
     {
         throw "Method is not implemented";
     }
