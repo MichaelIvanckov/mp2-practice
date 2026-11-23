@@ -114,8 +114,8 @@ public:
     using TDynamicVector<TDynamicVector<T>>::size;           // !! добавлено, т. к. тесты предполагают проверку размера матрицы
 
     // !! индексация с контролем  (и правильным смещением для верхнетреугольной матрицы)
-    T& at(size_t i, size_t j) { throw "Method is not implemented"; }                               // !! добавлен новый метод для корректной работы программы-примера (специфика верхнетреугольных матриц)
-    const T& at(size_t i, size_t j) const { throw "Method is not implemented"; }                   // !! добавлен новый метод для корректной работы программы-примера (специфика верхнетреугольных матриц)
+    T& at(size_t i, size_t j) { if (i < 0 || j < 0 || i >= size() || j >= size()) throw std::exception("..."); return (*this)[i][j - i]; }                               // !! добавлен новый метод для корректной работы программы-примера (специфика верхнетреугольных матриц)
+    const T& at(size_t i, size_t j) const { if (i < 0 || j < 0 || i >= size() || j >= size()) throw std::exception("..."); return (*this)[i][j - i]; }                   // !! добавлен новый метод для корректной работы программы-примера (специфика верхнетреугольных матриц)
 
     // сравнение
     using TDynamicVector<TDynamicVector<T>>::operator==;     // !! заменено на пробрасывание, это не меняет интерфейс
