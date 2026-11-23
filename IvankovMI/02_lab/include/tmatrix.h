@@ -107,7 +107,7 @@ public:
     TDynamicMatrix(size_t s = 1) : TDynamicVector<TDynamicVector<T>>(s)
     {
         for (size_t i = 0; i < sz; i++)
-            pMem[i] = TDynamicVector<T>(sz);
+            pMem[i] = TDynamicVector<T>(sz - i);
     }
 
     using TDynamicVector<TDynamicVector<T>>::operator[];
