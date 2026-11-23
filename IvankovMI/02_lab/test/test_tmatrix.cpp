@@ -124,8 +124,8 @@ TEST(TDynamicMatrix, can_assign_matrices_of_equal_size)
 
 	m2[0][0] = 1;
 	m2[0][1] = 2;
-	m2[1][1] = 3;
-	m2[1][2] = 4;
+	m2[1][0] = 3;
+	m2[1][1] = 4;
 
 	m1 = m2;
 
@@ -164,9 +164,9 @@ TEST(TDynamicMatrix, can_assign_matrices_of_different_size_1)
 	TDynamicMatrix<int> m2(4);
 
 	m2[0][0] = 1;
-	m2[1][1] = 2;
-	m2[2][2] = 3;
-	m2[3][3] = 4;
+	m2[1][0] = 2;
+	m2[2][0] = 3;
+	m2[3][0] = 4;
 
 	m1 = m2;
 
@@ -197,13 +197,13 @@ TEST(TDynamicMatrix, compare_equal_matrices_return_true)
 
 	m1[0][0] = 1;
 	m1[0][1] = 2;
-	m1[1][1] = 3;
-	m1[1][2] = 4;
+	m1[1][0] = 3;
+	m1[1][1] = 4;
 
 	m2[0][0] = 1;
 	m2[0][1] = 2;
-	m2[1][1] = 3;
-	m2[1][2] = 4;
+	m2[1][0] = 3;
+	m2[1][1] = 4;
 
 	EXPECT_TRUE(m1 == m2);
 }
@@ -213,8 +213,8 @@ TEST(TDynamicMatrix, compare_matrix_with_itself_return_true)
 	TDynamicMatrix<int> m(3);
 	m[0][0] = 1;
 	m[0][1] = 2;
-	m[1][1] = 3;
-	m[1][2] = 4;
+	m[1][0] = 3;
+	m[1][1] = 4;
 
 	EXPECT_TRUE(m == m);
 }
@@ -234,19 +234,19 @@ TEST(TDynamicMatrix, can_add_matrices_with_equal_size)
 
 	m1[0][0] = 1;
 	m1[0][1] = 2;
-	m1[1][1] = 3;
-	m1[1][2] = 4;
+	m1[1][0] = 3;
+	m1[1][1] = 4;
 
 	m2[0][0] = 5;
 	m2[0][1] = 6;
-	m2[1][1] = 7;
-	m2[1][2] = 8;
+	m2[1][0] = 7;
+	m2[1][1] = 8;
 
 	TDynamicMatrix<int> expected(3);
 	expected[0][0] = 6;
 	expected[0][1] = 8;
-	expected[1][1] = 10;
-	expected[1][2] = 12;
+	expected[1][0] = 10;
+	expected[1][1] = 12;
 
 	EXPECT_TRUE(m1 + m2 == expected);
 }
@@ -271,14 +271,14 @@ TEST(TDynamicMatrix, can_subtract_matrices_with_equal_size)
 
 	m2[0][0] = 1;
 	m2[0][1] = 2;
-	m2[1][1] = 3;
-	m2[1][2] = 4;
+	m2[1][0] = 3;
+	m2[1][0] = 4;
 
 	TDynamicMatrix<int> expected(3);
 	expected[0][0] = 4;
 	expected[0][1] = 4;
-	expected[1][1] = 4;
-	expected[1][2] = 4;
+	expected[1][0] = 4;
+	expected[1][0] = 4;
 
 	EXPECT_TRUE(m1 - m2 == expected);
 }
@@ -298,19 +298,19 @@ TEST(TDynamicMatrix, can_multyply_matrices_with_equal_size)
 
 	m1[0][0] = 5;
 	m1[0][1] = 6;
-	m1[1][1] = 7;
-	m1[2][2] = 8;
+	m1[1][0] = 7;
+	m1[2][0] = 8;
 
 	m2[0][0] = 1;
 	m2[0][1] = 2;
-	m2[1][1] = 3;
-	m2[2][2] = 4;
+	m2[1][0] = 3;
+	m2[2][0] = 4;
 
 	TDynamicMatrix<int> expected(3);
 	expected[0][0] = 5;
 	expected[0][1] = 28;
-	expected[1][1] = 21;
-	expected[2][2] = 32;
+	expected[1][0] = 21;
+	expected[2][0] = 32;
 
 	EXPECT_TRUE(m1 * m2 == expected);
 }
