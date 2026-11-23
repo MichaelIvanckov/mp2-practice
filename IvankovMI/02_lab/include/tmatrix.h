@@ -11,6 +11,7 @@
 #ifndef __TDynamicMatrix_H__
 #define __TDynamicMatrix_H__
 
+#include <cstddef>
 #include <cassert>
 #include <iostream>
 #include <utility>
@@ -112,7 +113,7 @@ public:
     using TDynamicVector<TDynamicVector<T>>::operator[];
     using TDynamicVector<TDynamicVector<T>>::size;           // !! добавлено, т. к. тесты предполагают проверку размера матрицы
 
-    // !! индексация с контролем
+    // !! индексация с контролем  (и правильным смещением для верхнетреугольной матрицы)
     T& at(size_t i, size_t j) { throw "Method is not implemented"; }                               // !! добавлен новый метод для корректной работы программы-примера (специфика верхнетреугольных матриц)
     const T& at(size_t i, size_t j) const { throw "Method is not implemented"; }                   // !! добавлен новый метод для корректной работы программы-примера (специфика верхнетреугольных матриц)
 
@@ -120,30 +121,20 @@ public:
     using TDynamicVector<TDynamicVector<T>>::operator==;     // !! заменено на пробрасывание, это не меняет интерфейс
 
     // матрично-скалярные операции
-    TDynamicMatrix<T> operator*(const T& val) const          // !! отсутствовал "const" и "<T>" после возвр. типа
-    {
-        throw "Method is not implemented";
-    }
+    TDynamicMatrix<T> operator*(const T& val) const;          // !! отсутствовал "const" и "<T>" после возвр. типа
+    
 
     // матрично-векторные операции
-    TDynamicVector<T> operator*(const TDynamicVector<T>& v) const    // !! отсутствовал "const"
-    {
-        throw "Method is not implemented";
-    }
+    TDynamicVector<T> operator*(const TDynamicVector<T>& v) const;    // !! отсутствовал "const"
+    
 
     // матрично-матричные операции
-    TDynamicMatrix<T> operator+(const TDynamicMatrix<T>& m) const    // !! отсутствовал "const" и "<T>" после типа аргумента и возвр. типа
-    {
-        throw "Method is not implemented";
-    }
-    TDynamicMatrix<T> operator-(const TDynamicMatrix<T>& m) const    // !! отсутствовал "const" и "<T>" после типа аргумента и возвр. типа
-    {
-        throw "Method is not implemented";
-    }
-    TDynamicMatrix<T> operator*(const TDynamicMatrix<T>& m) const    // !! отсутствовал "const" и "<T>" после типа аргумента и возвр. типа
-    {
-        throw "Method is not implemented";
-    }
+    TDynamicMatrix<T> operator+(const TDynamicMatrix<T>& m) const;    // !! отсутствовал "const" и "<T>" после типа аргумента и возвр. типа
+    
+    TDynamicMatrix<T> operator-(const TDynamicMatrix<T>& m) const;    // !! отсутствовал "const" и "<T>" после типа аргумента и возвр. типа
+    
+    TDynamicMatrix<T> operator*(const TDynamicMatrix<T>& m) const;    // !! отсутствовал "const" и "<T>" после типа аргумента и возвр. типа
+    
 
     // ввод/вывод
     friend istream& operator>>(istream& istr, TDynamicMatrix<T>& v)         // !! отсутствовал "<T>" после типа аргумента
@@ -319,6 +310,131 @@ T TDynamicVector<T>::operator*(const TDynamicVector<T>& v) const
     for (size_t i = 0; i < sz; ++i)
         result = result + pMem[i] * v.pMem[i];
     return result;
+}
+
+// -------- TDynamicMatrix ---------
+#include <cstddef>
+#include <stdexcept>
+
+template<typename T>
+TDynamicMatrix<T> TDynamicMatrix<T>::operator+(const TDynamicMatrix<T>& m) const
+{
+    const std::size_t n = this->size();
+    if (n != m.size()) {
+        throw std::invalid_argument(
+            "TDynamicMatrix::operator+: matrix sizes must be equal");
+    }
+
+    TDynamicMatrix<T> res(n);
+
+    for (std::size_t i = 0; i < n; ++i) {
+        const TDynamicVector<T>& a = (*this)[i];
+        const TDynamicVector<T>& b = m[i];
+
+        // 
+        res[i] = (*this)[i] + m[i];
+    }
+
+    return res;
+}
+
+template<typename T>
+TDynamicMatrix<T> TDynamicMatrix<T>::operator-(const TDynamicMatrix<T>& m) const
+{
+    const std::size_t n = this->size();
+    if (n != m.size()) {
+        throw std::invalid_argument(
+            "TDynamicMatrix::operator-: matrix sizes must be equal");
+    }
+
+    TDynamicMatrix<T> res(n);
+
+    for (std::size_t i = 0; i < n; ++i) {
+        const TDynamicVector<T>& a = (*this)[i];
+        const TDynamicVector<T>& b = m[i];
+
+        // 
+        res[i] = (*this)[i] - m[i];
+    }
+
+    return res;
+}
+
+template<typename T>
+TDynamicMatrix<T> TDynamicMatrix<T>::operator*(const T& val) const
+{
+    const std::size_t n = this->size();
+    TDynamicMatrix<T> res(n);
+
+    for (std::size_t i = 0; i < n; ++i) {
+        const TDynamicVector<T>& a = (*this)[i];
+
+        res[i] = (*this)[i] * val;
+    }
+
+    return res;
+}
+
+template<typename T>
+TDynamicMatrix<T> TDynamicMatrix<T>::operator*(const TDynamicMatrix<T>& rhs) const
+{
+    const std::size_t n = this->size();
+    if (rhs.size() == n) throw std::invalid_argument(
+        "TDynamicMatrix::operator*: matrix sizes must be equal");
+
+    // 
+    TDynamicMatrix<T> res(n);
+    for (std::size_t i = 0; i < n; ++i) {
+        res[i] = TDynamicVector<T>(n - i);
+        for (std::size_t j = 0; j < n - i; ++j) {
+            res[i][j] = T{};
+        }
+    }
+
+    // 
+    for (std::size_t i = 0; i < n; ++i) {
+        TDynamicVector<T>& crow = res[i];
+        const TDynamicVector<T>& arow = (*this)[i];
+
+        for (std::size_t p = i; p < n; ++p) {
+            const T a = arow[p - i];
+            const TDynamicVector<T>& brow = rhs[p];
+
+            const std::size_t base = p - i;
+            const std::size_t len = n - p;
+
+            for (std::size_t q = 0; q < len; ++q) {
+                // 
+                crow[base + q] += a * brow[q];
+            }
+        }
+    }
+
+    return res;
+}
+
+template<typename T>
+TDynamicVector<T> TDynamicMatrix<T>::operator*(const TDynamicVector<T>& v) const
+{
+    const std::size_t n = this->size();
+    if (v.size() == n) throw std::invalid_argument(
+        "TDynamicMatrix::operator*: matrix sizes must be equal");
+
+    TDynamicVector<T> res(n);
+
+    // 
+    for (std::size_t i = 0; i < n; ++i) {
+        const TDynamicVector<T>& row = (*this)[i];
+        T sum = T{};
+
+        for (std::size_t k = 0; k < row.size(); ++k) {
+            sum += row[k] * v[i + k];
+        }
+
+        res[i] = sum;
+    }
+
+    return res;
 }
 
 #endif
