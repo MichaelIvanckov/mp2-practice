@@ -118,7 +118,7 @@ public:
     const T& at(size_t i, size_t j) const { if (i < 0 || j < 0 || i >= size() || j >= size()) throw std::exception("..."); return (*this)[i][j - i]; }                   // !! добавлен новый метод для корректной работы программы-примера (специфика верхнетреугольных матриц)
 
     // сравнение
-    using TDynamicVector<TDynamicVector<T>>::operator==;     // !! заменено на пробрасывание, это не меняет интерфейс
+    bool operator==(const TDynamicMatrix<T>& v) const noexcept;     // !! заменено на пробрасывание, это не меняет интерфейс
 
     // матрично-скалярные операции
     TDynamicMatrix<T> operator*(const T& val) const;          // !! отсутствовал "const" и "<T>" после возвр. типа
@@ -358,6 +358,17 @@ TDynamicMatrix<T> TDynamicMatrix<T>::operator-(const TDynamicMatrix<T>& m) const
     }
 
     return res;
+}
+
+template<typename T>
+inline bool TDynamicMatrix<T>::operator==(const TDynamicMatrix<T>& m) const noexcept
+{
+    if (sz != m.sz)
+        return false;
+    for (size_t i = 0; i < sz; ++i)
+        if ((*this)[i] != m[i])
+            return false;
+    return true;
 }
 
 template<typename T>
