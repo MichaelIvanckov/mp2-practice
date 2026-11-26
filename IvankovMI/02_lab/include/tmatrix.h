@@ -114,8 +114,8 @@ public:
     using TDynamicVector<TDynamicVector<T>>::size;           // !! добавлено, т. к. тесты предполагают проверку размера матрицы
 
     // !! индексация с контролем  (и правильным смещением для верхнетреугольной матрицы)
-    T& at(size_t i, size_t j) { if (i < 0 || j < 0 || i >= size() || j >= size()) throw std::exception("..."); return (*this)[i][j - i]; }                               // !! добавлен новый метод для корректной работы программы-примера (специфика верхнетреугольных матриц)
-    const T& at(size_t i, size_t j) const { if (i < 0 || j < 0 || i >= size() || j >= size()) throw std::exception("..."); return (*this)[i][j - i]; }                   // !! добавлен новый метод для корректной работы программы-примера (специфика верхнетреугольных матриц)
+    T& at(size_t i, size_t j);                            // !! добавлен новый метод для корректной работы программы-примера (специфика верхнетреугольных матриц)
+    const T& at(size_t i, size_t j) const;                // !! добавлен новый метод для корректной работы программы-примера (специфика верхнетреугольных матриц)
 
     // сравнение
     bool operator==(const TDynamicMatrix<T>& v) const noexcept;     // !! заменено на пробрасывание, это не меняет интерфейс
@@ -312,9 +312,24 @@ T TDynamicVector<T>::operator*(const TDynamicVector<T>& v) const
     return result;
 }
 
+
 // -------- TDynamicMatrix ---------
-#include <cstddef>
-#include <stdexcept>
+
+template<typename T>
+T& TDynamicMatrix<T>::at(size_t i, size_t j)
+{
+    if (i < 0 || j < 0 || i >= size() || j >= size()) throw std::out_of_range("Index is out of range");
+    if (j - i < 0) throw std::out_of_range("You can't write to the bottom triangle");
+    return (*this)[i][j - i];
+}
+
+template<typename T>
+const T& TDynamicMatrix<T>::at(size_t i, size_t j) const
+{
+    static T zero{};
+    if (i < 0 || j < 0 || i >= size() || j >= size()) throw std::out_of_range("Index is out of range");
+    return (j - i < 0) ? zero : (*this)[i][j - i];
+}
 
 template<typename T>
 TDynamicMatrix<T> TDynamicMatrix<T>::operator+(const TDynamicMatrix<T>& m) const
