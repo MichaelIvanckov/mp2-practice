@@ -29,8 +29,8 @@ TEST(TDynamicMatrix, copied_matrix_is_equal_to_source_one)
 	TDynamicMatrix<int> m(3);
 	m[0][0] = 1;
 	m[0][1] = 2;
-	m[1][1] = 3;
-	m[1][2] = 4;
+	m[1][0] = 3;
+	m[1][1] = 4;
 
 	TDynamicMatrix<int> m1(m);
 
@@ -266,19 +266,19 @@ TEST(TDynamicMatrix, can_subtract_matrices_with_equal_size)
 
 	m1[0][0] = 5;
 	m1[0][1] = 6;
-	m1[1][1] = 7;
-	m1[1][2] = 8;
+	m1[1][0] = 7;
+	m1[1][1] = 8;
 
 	m2[0][0] = 1;
 	m2[0][1] = 2;
 	m2[1][0] = 3;
-	m2[1][0] = 4;
+	m2[1][1] = 4;
 
 	TDynamicMatrix<int> expected(3);
 	expected[0][0] = 4;
 	expected[0][1] = 4;
 	expected[1][0] = 4;
-	expected[1][0] = 4;
+	expected[1][1] = 4;
 
 	EXPECT_TRUE(m1 - m2 == expected);
 }
