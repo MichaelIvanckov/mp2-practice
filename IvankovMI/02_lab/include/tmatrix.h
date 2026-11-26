@@ -106,6 +106,8 @@ class TDynamicMatrix : private TDynamicVector<TDynamicVector<T>>
 public:
     TDynamicMatrix(size_t s = 1) : TDynamicVector<TDynamicVector<T>>(s)
     {
+        if (s > MAX_MATRIX_SIZE)
+            throw std::out_of_range("Matrix size should be greater than zero and less than MAX_MATRIX_SIZE");
         for (size_t i = 0; i < sz; i++)
             pMem[i] = TDynamicVector<T>(sz - i);
     }
